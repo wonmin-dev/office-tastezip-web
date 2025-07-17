@@ -1,5 +1,5 @@
 import { Separator } from '@/components/ui/separator';
-import FormSection from '@/modules/auth/ui/sections/form-section';
+import SignInFormSection from '@/modules/auth/ui/sections/sign-in-form-section';
 import Link from 'next/link';
 
 export const SignInView = () => {
@@ -7,7 +7,7 @@ export const SignInView = () => {
     <div className="flex flex-col items-center gap-y-10 min-w-[320px]">
       <h1 className="text-3xl font-bold mb-5">오피스맛집</h1>
 
-      <FormSection />
+      <SignInFormSection />
 
       <div className="flex items-center gap-x-2 w-full">
         <Separator className="flex-1" />

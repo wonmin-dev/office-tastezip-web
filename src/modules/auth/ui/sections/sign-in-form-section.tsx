@@ -12,7 +12,7 @@ const formSchema = z.object({
   password: z.string().trim().min(1),
 });
 
-export default function FormSection() {
+export default function SignInFormSection() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
