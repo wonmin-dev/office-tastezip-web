@@ -23,7 +23,7 @@ export default function FormSection() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-3 w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-5 w-full">
         <FormField
           control={form.control}
           name="email"
@@ -48,7 +48,7 @@ export default function FormSection() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="cursor-pointer">
+        <Button type="submit" className="cursor-pointer mt-5">
           Login
         </Button>
       </form>

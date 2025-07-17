@@ -4,8 +4,8 @@ import Link from 'next/link';
 
 export const SignInView = () => {
   return (
-    <div className="flex flex-col items-center gap-y-5 w-[320px]">
-      <h1 className="text-3xl font-bold mb-6">오피스맛집</h1>
+    <div className="flex flex-col items-center gap-y-10 min-w-[320px]">
+      <h1 className="text-3xl font-bold mb-5">오피스맛집</h1>
 
       <FormSection />
 
