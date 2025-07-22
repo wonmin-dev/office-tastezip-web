@@ -89,6 +89,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.7
         version: 1.2.7(@types/react-dom@19.1.5(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@use-funnel/browser':
+        specifier: ^0.0.15
+        version: 0.0.15(react@19.1.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1194,6 +1197,16 @@ packages:
 
   '@types/react@19.1.4':
     resolution: {integrity: sha512-EB1yiiYdvySuIITtD5lhW4yPyJ31RkJkkDw794LaQYrxCSaQV/47y5o1FMC4zF9ZyjUjzJMZwbovEnT5yHTW6g==}
+
+  '@use-funnel/browser@0.0.15':
+    resolution: {integrity: sha512-tHMyxZdvmuQw/pmeE0n3bOn81huxjfCG3TblmW0A/ivbdQN7unAp0Gn8CCeeiIbbztDL6IDw1v255WL2PR9MoQ==}
+    peerDependencies:
+      react: '>=16.8'
+
+  '@use-funnel/core@0.0.12':
+    resolution: {integrity: sha512-IikmJCqiQxbqxMAKdIEvX4MiuaM4nu0mfuAdnbI4CKf1FFLy/c4GHGKHW2+zm4aQAdEtxCuwou/wOwDhrTSWbg==}
+    peerDependencies:
+      react: '>=16.8'
 
   aria-hidden@1.2.6:
     resolution: {integrity: sha512-ik3ZgC9dY/lYVVM++OISsaYDeg1tb0VtP5uL3ouh1koGOaUMDPpbFIei4JkFimWUFPn90sbMNMXQAIVOlnYKJA==}
@@ -2666,6 +2679,15 @@ snapshots:
   '@types/react@19.1.4':
     dependencies:
       csstype: 3.1.3
+
+  '@use-funnel/browser@0.0.15(react@19.1.0)':
+    dependencies:
+      '@use-funnel/core': 0.0.12(react@19.1.0)
+      react: 19.1.0
+
+  '@use-funnel/core@0.0.12(react@19.1.0)':
+    dependencies:
+      react: 19.1.0
 
   aria-hidden@1.2.6:
     dependencies:
