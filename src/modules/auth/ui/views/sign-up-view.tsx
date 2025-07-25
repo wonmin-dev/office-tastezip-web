@@ -2,7 +2,7 @@ import { SignUpFormSection } from '@/modules/auth/ui/sections/sign-up-form-secti
 
 export const SignUpView = () => {
   return (
-    <div className="min-w-[320px]">
+    <div className="min-w-xs">
       <SignUpFormSection />
     </div>
   );
