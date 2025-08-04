@@ -24,7 +24,11 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { notEmpty } from '@/lib/utils';
 import { JOB_CATEGORIES, POSITION_CATEGORIES } from '@/modules/auth/constants';
-import { emailVerifyOptions, verifyCheckOptions } from '@/modules/auth/server/mutations';
+import {
+  emailVerifyOptions,
+  signUpOptions,
+  verifyCheckOptions,
+} from '@/modules/auth/server/mutations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useFunnel } from '@use-funnel/browser';
@@ -51,6 +55,7 @@ type SignUpStep = {
     confirmPassword: string;
     code: string;
     nickname?: string;
+    organizationName?: string;
     job?: string;
     position?: string;
     joinYear?: string;
@@ -61,6 +66,7 @@ type SignUpStep = {
     confirmPassword: string;
     code: string;
     nickname: string;
+    organizationName: string;
     job: string;
     position: string;
     joinYear: string;
@@ -86,6 +92,7 @@ const signUpSchema = z.object({
     .string()
     .max(20, '이름은 최대 20자까지 허용됩니다.')
     .pipe(notEmpty('이름을 입력해주세요.')),
+  organizationName: z.string().pipe(notEmpty('기업명을 입력해주세요.')),
   job: z.string().pipe(notEmpty('직무를 선택해주세요.')),
   position: z.string().pipe(notEmpty('직급을 선택해주세요.')),
   joinYear: z.string().pipe(notEmpty('입사년도를 선택해주세요.')),
@@ -94,7 +101,7 @@ const signUpSchema = z.object({
   marketingAgree: z.boolean(),
 });
 
-type SignUpSchema = z.infer<typeof signUpSchema>;
+export type SignUpSchema = z.infer<typeof signUpSchema>;
 
 export const SignUpFormSection = () => {
   const [currentYear, setCurrentYear] = useState<string>('2025');
@@ -115,6 +122,7 @@ export const SignUpFormSection = () => {
       confirmPassword: '',
       code: '',
       nickname: '',
+      organizationName: '',
       job: 'developer',
       position: '1',
       joinYear: currentYear,
@@ -124,12 +132,14 @@ export const SignUpFormSection = () => {
     },
   });
 
+  const signUp = useMutation(signUpOptions);
+
   useEffect(() => {
     setCurrentYear(new Date().getFullYear().toString());
   }, []);
 
   const onSubmit = (data: SignUpSchema) => {
-    console.log(data);
+    signUp.mutate(data);
   };
 
   return (
@@ -154,8 +164,14 @@ export const SignUpFormSection = () => {
               )}
               CreateAccount={({ history }) => (
                 <CreateAccount
-                  onNext={(nickname, job, position, joinYear) =>
-                    history.push('TermsAgreement', { nickname, job, position, joinYear })
+                  onNext={(nickname, organizationName, job, position, joinYear) =>
+                    history.push('TermsAgreement', {
+                      nickname,
+                      organizationName,
+                      job,
+                      position,
+                      joinYear,
+                    })
                   }
                   currentYear={currentYear}
                 />
@@ -249,15 +265,15 @@ interface AuthenticateEmailProps {
 
 const AuthenticateEmail = ({ email, onNext }: AuthenticateEmailProps) => {
   const { control, getValues, trigger } = useFormContext<SignUpSchema>();
-  const emailVerifyMutate = useMutation(emailVerifyOptions);
-  const verifyCheckMutate = useMutation(verifyCheckOptions);
+  const emailVerify = useMutation(emailVerifyOptions);
+  const verifyCheck = useMutation(verifyCheckOptions);
 
   const proceedToNext = async () => {
     const isValid = await trigger(['code']);
     if (isValid) {
       const code = getValues('code');
 
-      verifyCheckMutate.mutate(
+      verifyCheck.mutate(
         { code, email },
         {
           onSuccess: () => {
@@ -288,22 +304,28 @@ const AuthenticateEmail = ({ email, onNext }: AuthenticateEmailProps) => {
         <Button
           type="button"
           variant="outline"
-          onClick={() => emailVerifyMutate.mutate({ email })}
+          onClick={() => emailVerify.mutate({ email })}
           className="hover:cursor-pointer"
-          disabled={emailVerifyMutate.isPending}
+          disabled={emailVerify.isPending}
         >
-          {emailVerifyMutate.isPending ? <Loader2Icon className="animate-spin" /> : '인증번호 발송'}
+          {emailVerify.isPending ? <Loader2Icon className="animate-spin" /> : '인증번호 발송'}
         </Button>
       </div>
-      <Button type="button" onClick={proceedToNext} disabled={verifyCheckMutate.isPending}>
-        {verifyCheckMutate.isPending ? <Loader2Icon className="animate-spin" /> : '다음'}
+      <Button type="button" onClick={proceedToNext} disabled={verifyCheck.isPending}>
+        {verifyCheck.isPending ? <Loader2Icon className="animate-spin" /> : '다음'}
       </Button>
     </div>
   );
 };
 
 interface CreateAccountProps {
-  onNext: (nickname: string, job: string, position: string, joinYear: string) => void;
+  onNext: (
+    nickname: string,
+    organizationName: string,
+    job: string,
+    position: string,
+    joinYear: string,
+  ) => void;
   currentYear: string;
 }
 
@@ -315,11 +337,12 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
 
     if (isValid) {
       const nickname = getValues('nickname');
+      const organizationName = getValues('organizationName');
       const job = getValues('job');
       const position = getValues('position');
       const joinYear = getValues('joinYear');
 
-      onNext(nickname, job, position, joinYear);
+      onNext(nickname, organizationName, job, position, joinYear);
     }
   };
 
