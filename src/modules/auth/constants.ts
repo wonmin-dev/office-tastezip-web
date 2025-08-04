@@ -1,0 +1,33 @@
+export const JOB_CATEGORIES = [
+  { value: "DEVELOPMENT", label: "개발" },
+  { value: "PLANNING", label: "기획" },
+  { value: "DESIGN", label: "디자인" },
+  { value: "MARKETING", label: "마케팅" },
+  { value: "SALES", label: "영업" },
+  { value: "CS", label: "고객지원" },
+  { value: "HR", label: "인사/총무" },
+  { value: "FINANCE", label: "재무/회계" },
+  { value: "LEGAL", label: "법무/감사" },
+  { value: "EDUCATION", label: "교육/연구" },
+  { value: "RND", label: "연구개발" },
+  { value: "PRODUCTION", label: "생산/제조" },
+  { value: "LOGISTICS", label: "물류/구매" },
+  { value: "MEDICAL", label: "의료/보건" },
+  { value: "CONSULTING", label: "컨설팅" },
+  { value: "PUBLIC", label: "공공/행정" },
+  { value: "FREELANCER", label: "프리랜서" },
+  { value: "ETC", label: "기타" },
+];
+
+export const POSITION_CATEGORIES = [
+  { value: "INTERN", label: "인턴" },
+  { value: "JUNIOR", label: "주니어/사원" },
+  { value: "SENIOR", label: "선임/주임/대리" },
+  { value: "LEAD", label: "책임/과장" },
+  { value: "PRINCIPAL", label: "수석/차장" },
+  { value: "HEAD", label: "전임/부장/팀장" },
+  { value: "EXECUTIVE", label: "임원" },
+  { value: "CEO", label: "대표" },
+  { value: "FREELANCER", label: "프리랜서" },
+  { value: "ETC", label: "기타" },
+];
