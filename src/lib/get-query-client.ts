@@ -1,8 +1,10 @@
 import {
   defaultShouldDehydrateQuery,
   isServer,
+  MutationCache,
   QueryClient,
 } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const makeQueryClient = () => {
   return new QueryClient({
@@ -16,6 +18,11 @@ const makeQueryClient = () => {
           query.state.status === "pending",
       },
     },
+    mutationCache: new MutationCache({
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
   });
 };
 

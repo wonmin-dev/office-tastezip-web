@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Providers from '@/app/providers';
 
 import './globals.css';
+import { Toaster } from '@/components/ui/sonner';
 
 const pretendard = localFont({
   src: './fonts/PretendardVariable.woff2',
@@ -23,7 +24,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${pretendard.className} antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Toaster />
+          {children}
+        </Providers>
       </body>
     </html>
   );
