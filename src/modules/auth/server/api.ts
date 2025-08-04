@@ -5,7 +5,7 @@ type emailVerifyReq = {
 };
 
 export const postEmailVerify = async (data: emailVerifyReq) => {
-  return await customFetch("/users/email/verify", {
+  return await customFetch("/auth/email/verify", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -17,7 +17,7 @@ type VerifyCheckReq = {
 };
 
 export const postVerifyCheck = async (data: VerifyCheckReq) => {
-  return await customFetch("/users/email/verify/check", {
+  return await customFetch("/auth/email/verify/check", {
     method: "POST",
     body: JSON.stringify(data),
   });
