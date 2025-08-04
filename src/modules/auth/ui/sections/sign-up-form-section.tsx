@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -19,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { notEmpty } from '@/lib/utils';
+import { JOB_CATEGORIES, POSITION_CATEGORIES } from '@/modules/auth/constants';
 import { emailVerifyOptions, verifyCheckOptions } from '@/modules/auth/server/mutations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -31,49 +33,51 @@ type SignUpStep = {
   SignUp: {
     email?: string;
     password?: string;
-    confirm?: string;
+    confirmPassword?: string;
   };
   AuthenticateEmail: {
     email: string;
     password: string;
-    confirm: string;
+    confirmPassword: string;
     code?: string;
   };
   CreateAccount: {
     email: string;
     password: string;
-    confirm: string;
+    confirmPassword: string;
     code: string;
-    name?: string;
-    duty?: string;
+    nickname?: string;
+    job?: string;
     position?: string;
-    employmentYear?: string;
+    joinYear?: string;
   };
   TermsAgreement: {
     email: string;
     password: string;
-    confirm: string;
+    confirmPassword: string;
     code: string;
-    name: string;
-    duty: string;
+    nickname: string;
+    job: string;
     position: string;
-    employmentYear: string;
-    useCondition?: boolean;
-    receivingMarketingInfo?: boolean;
+    joinYear: string;
+    privacyAgree?: boolean;
+    marketingAgree?: boolean;
+    termsAgree?: boolean;
   };
 };
 
 const signUpSchema = z.object({
   email: z.email({ error: '이메일을 입력해주세요.' }),
   password: z.string().pipe(notEmpty('비밀번호를 입력해주세요.')),
-  confirm: z.string().pipe(notEmpty('비밀번호를 입력해주세요.')),
+  confirmPassword: z.string().pipe(notEmpty('비밀번호를 입력해주세요.')),
   code: z.string().regex(/^\d+$/).pipe(notEmpty('인증번호를 입력해주세요.')),
-  name: z.string().pipe(notEmpty('이름을 입력해주세요.')),
-  duty: z.string().pipe(notEmpty('직무를 선택해주세요.')),
+  nickname: z.string().pipe(notEmpty('이름을 입력해주세요.')),
+  job: z.string().pipe(notEmpty('직무를 선택해주세요.')),
   position: z.string().pipe(notEmpty('직급을 선택해주세요.')),
-  employmentYear: z.string().pipe(notEmpty('입사년도를 선택해주세요.')),
-  useCondition: z.boolean(),
-  receivingMarketingInfo: z.boolean(),
+  joinYear: z.string().pipe(notEmpty('입사년도를 선택해주세요.')),
+  privacyAgree: z.boolean().refine((value) => value === true),
+  termsAgree: z.boolean().refine((value) => value === true),
+  marketingAgree: z.boolean(),
 });
 
 type SignUpSchema = z.infer<typeof signUpSchema>;
@@ -94,14 +98,15 @@ export const SignUpFormSection = () => {
     defaultValues: {
       email: '',
       password: '',
-      confirm: '',
+      confirmPassword: '',
       code: '',
-      name: '',
-      duty: 'developer',
+      nickname: '',
+      job: 'developer',
       position: '1',
-      employmentYear: currentYear,
-      receivingMarketingInfo: false,
-      useCondition: false,
+      joinYear: currentYear,
+      privacyAgree: false,
+      termsAgree: false,
+      marketingAgree: false,
     },
   });
 
@@ -122,8 +127,8 @@ export const SignUpFormSection = () => {
             <funnel.Render
               SignUp={({ history }) => (
                 <SignUp
-                  onNext={(email, password, confirm) =>
-                    history.push('AuthenticateEmail', { email, password, confirm })
+                  onNext={(email, password, confirmPassword) =>
+                    history.push('AuthenticateEmail', { email, password, confirmPassword })
                   }
                 />
               )}
@@ -135,8 +140,8 @@ export const SignUpFormSection = () => {
               )}
               CreateAccount={({ history }) => (
                 <CreateAccount
-                  onNext={(name, duty, position, employmentYear) =>
-                    history.push('TermsAgreement', { name, duty, position, employmentYear })
+                  onNext={(nickname, job, position, joinYear) =>
+                    history.push('TermsAgreement', { nickname, job, position, joinYear })
                   }
                   currentYear={currentYear}
                 />
@@ -151,22 +156,22 @@ export const SignUpFormSection = () => {
 };
 
 interface SignUpProps {
-  onNext: (email: string, password: string, confirm: string) => void;
+  onNext: (email: string, password: string, confirmPassword: string) => void;
 }
 
 const SignUp = ({ onNext }: SignUpProps) => {
   const { control, getValues, trigger, setError } = useFormContext<SignUpSchema>();
 
   const proceedToNext = async () => {
-    const isValid = await trigger(['email', 'password', 'confirm']);
+    const isValid = await trigger(['email', 'password', 'confirmPassword']);
 
     if (isValid) {
       const email = getValues('email');
       const password = getValues('password');
-      const confirm = getValues('confirm');
+      const confirm = getValues('confirmPassword');
 
       if (password !== confirm) {
-        setError('confirm', { message: '비밀번호가 일치하지 않습니다.' });
+        setError('confirmPassword', { message: '비밀번호가 일치하지 않습니다.' });
       } else {
         onNext(email, password, confirm);
       }
@@ -204,7 +209,7 @@ const SignUp = ({ onNext }: SignUpProps) => {
       />
       <FormField
         control={control}
-        name="confirm"
+        name="confirmPassword"
         render={({ field }) => (
           <FormItem>
             <FormLabel>비밀번호 재확인</FormLabel>
@@ -286,7 +291,7 @@ const AuthenticateEmail = ({ email, onNext }: AuthenticateEmailProps) => {
 };
 
 interface CreateAccountProps {
-  onNext: (name: string, duty: string, position: string, employmentYear: string) => void;
+  onNext: (nickname: string, job: string, position: string, joinYear: string) => void;
   currentYear: string;
 }
 
@@ -294,15 +299,15 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
   const { control, trigger, getValues } = useFormContext<SignUpSchema>();
 
   const proceedToNext = async () => {
-    const isValid = await trigger(['name', 'duty', 'position', 'employmentYear']);
+    const isValid = await trigger(['nickname', 'job', 'position', 'joinYear']);
 
     if (isValid) {
-      const name = getValues('name');
-      const duty = getValues('duty');
+      const nickname = getValues('nickname');
+      const job = getValues('job');
       const position = getValues('position');
-      const employmentYear = getValues('employmentYear');
+      const joinYear = getValues('joinYear');
 
-      onNext(name, duty, position, employmentYear);
+      onNext(nickname, job, position, joinYear);
     }
   };
 
@@ -310,7 +315,7 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
     <div className="flex flex-col gap-y-8">
       <h2 className="text-2xl font-bold text-center mb-5">계정 생성하기</h2>
       <FormField
-        name="name"
+        name="nickname"
         control={control}
         render={({ field }) => (
           <FormItem>
@@ -323,7 +328,7 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
         )}
       />
       <FormField
-        name="duty"
+        name="job"
         control={control}
         render={({ field }) => (
           <FormItem>
@@ -335,8 +340,11 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="developer">개발자</SelectItem>
-                <SelectItem value="cooker">요리사</SelectItem>
+                {JOB_CATEGORIES.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <FormMessage />
@@ -356,8 +364,11 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="1">사원</SelectItem>
-                <SelectItem value="2">대리</SelectItem>
+                {POSITION_CATEGORIES.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <FormMessage />
@@ -365,7 +376,7 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
         )}
       />
       <FormField
-        name="employmentYear"
+        name="joinYear"
         control={control}
         render={({ field }) => (
           <FormItem>
@@ -396,10 +407,54 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
 };
 
 const TermsAgreement = () => {
-  const { control } = useFormContext();
+  const { control } = useFormContext<SignUpSchema>();
   return (
     <div className="flex flex-col gap-y-8">
       <h2 className="text-2xl font-bold text-center mb-5">약관 동의하기</h2>
+      <div className="space-y-3">
+        <FormField
+          name="termsAgree"
+          control={control}
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center">
+              <FormControl>
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+              <FormLabel>
+                <span className="text-red-500">(필수)</span>서비스 이용약관 동의
+              </FormLabel>
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="privacyAgree"
+          control={control}
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center">
+              <FormControl>
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+              <FormLabel>
+                <span className="text-red-500">(필수)</span>개인정보 수집 및 이용 동의 여부
+              </FormLabel>
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="marketingAgree"
+          control={control}
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center">
+              <FormControl>
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+              <FormLabel>
+                <span>(선택)</span>마케팅 정보 수신 동의
+              </FormLabel>
+            </FormItem>
+          )}
+        />
+      </div>
       <Button type="submit">다음</Button>
     </div>
   );
