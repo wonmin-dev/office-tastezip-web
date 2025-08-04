@@ -1,4 +1,4 @@
-import { customFetch } from "@/lib/custom-fetch";
+import { apiClient } from "@/lib/api-client";
 import type { SignUpSchema } from "@/modules/auth/ui/sections/sign-up-form-section";
 
 type emailVerifyReq = {
@@ -6,10 +6,7 @@ type emailVerifyReq = {
 };
 
 export const postEmailVerify = async (data: emailVerifyReq) => {
-  return await customFetch("/auth/email/verify", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  return await apiClient.post("/auth/email/verify", data);
 };
 
 type VerifyCheckReq = {
@@ -18,17 +15,20 @@ type VerifyCheckReq = {
 };
 
 export const postVerifyCheck = async (data: VerifyCheckReq) => {
-  return await customFetch("/auth/email/verify/check", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  return await apiClient.post("/auth/email/verify/check", data);
 };
 
 type SignUpReq = Omit<SignUpSchema, "code">;
 
 export const postSignUp = async (data: SignUpReq) => {
-  return await customFetch("/users/register", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  return await apiClient.post("/users/register", data);
+};
+
+type OrganizationNamesReq = {
+  name: string;
+};
+
+export const getOrganizationNames = async (data: OrganizationNamesReq) => {
+  const params = new URLSearchParams(data);
+  return await apiClient.get(`/organizations/name-search?${params.toString()}`);
 };
