@@ -23,8 +23,8 @@ export const customFetch = async <T>(
   });
 
   if (!res.ok) {
-    const error = await res.text();
-    throw new Error(error);
+    const error = await res.json();
+    throw new Error(error.message);
   }
 
   return res.json();
