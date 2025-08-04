@@ -24,11 +24,15 @@ export const postSignUp = async (data: SignUpReq) => {
   return await apiClient.post("/users/register", data);
 };
 
-type OrganizationNamesReq = {
+export type OrganizationNamesReq = {
   name: string;
 };
 
+type OrganizationNamesRes = { id: string; name: string }[];
+
 export const getOrganizationNames = async (data: OrganizationNamesReq) => {
   const params = new URLSearchParams(data);
-  return await apiClient.get(`/organizations/name-search?${params.toString()}`);
+  return await apiClient.get<OrganizationNamesRes>(
+    `/organizations/name-search?${params.toString()}`
+  );
 };
