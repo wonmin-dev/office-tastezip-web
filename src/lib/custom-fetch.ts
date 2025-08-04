@@ -12,7 +12,8 @@ export const customFetch = async <T>(
     process.env.NODE_ENV === "development"
       ? "http://211.236.39.250:18090/api/v1/otz"
       : process.env.NEXT_PUBLIC_API_BASE_URL;
-  const url = new URL(endPoint, BASE_URL).toString();
+  const url = BASE_URL + endPoint;
+
   const res = await fetch(url, {
     ...options,
     headers: {
