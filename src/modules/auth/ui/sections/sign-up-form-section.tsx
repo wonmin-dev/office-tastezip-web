@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import {
   Select,
@@ -19,12 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { notEmpty } from '@/lib/utils';
 import { JOB_CATEGORIES, POSITION_CATEGORIES } from '@/modules/auth/constants';
 import { emailVerifyOptions, verifyCheckOptions } from '@/modules/auth/server/mutations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useFunnel } from '@use-funnel/browser';
+import { Loader2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import z from 'zod';
@@ -70,7 +73,7 @@ const signUpSchema = z.object({
   email: z.email({ error: '이메일을 입력해주세요.' }),
   password: z.string().pipe(notEmpty('비밀번호를 입력해주세요.')),
   confirmPassword: z.string().pipe(notEmpty('비밀번호를 입력해주세요.')),
-  code: z.string().regex(/^\d+$/).pipe(notEmpty('인증번호를 입력해주세요.')),
+  code: z.string().pipe(notEmpty('인증번호를 입력해주세요.')),
   nickname: z.string().pipe(notEmpty('이름을 입력해주세요.')),
   job: z.string().pipe(notEmpty('직무를 선택해주세요.')),
   position: z.string().pipe(notEmpty('직급을 선택해주세요.')),
@@ -242,17 +245,14 @@ const AuthenticateEmail = ({ email, onNext }: AuthenticateEmailProps) => {
     if (isValid) {
       const code = getValues('code');
 
-      // TODO: 이메일 인증번호 발송 기능 적용
-      onNext(code);
-
-      // verifyCheckMutate.mutate(
-      //   { code, email },
-      //   {
-      //     onSuccess: () => {
-      //       onNext(code);
-      //     },
-      //   },
-      // );
+      verifyCheckMutate.mutate(
+        { code, email },
+        {
+          onSuccess: () => {
+            onNext(code);
+          },
+        },
+      );
     }
   };
 
@@ -278,13 +278,13 @@ const AuthenticateEmail = ({ email, onNext }: AuthenticateEmailProps) => {
           variant="outline"
           onClick={() => emailVerifyMutate.mutate({ email })}
           className="hover:cursor-pointer"
-          disabled
+          disabled={emailVerifyMutate.isPending}
         >
-          인증번호 발송
+          {emailVerifyMutate.isPending ? <Loader2Icon className="animate-spin" /> : '인증번호 발송'}
         </Button>
       </div>
-      <Button type="button" onClick={proceedToNext}>
-        다음
+      <Button type="button" onClick={proceedToNext} disabled={verifyCheckMutate.isPending}>
+        {verifyCheckMutate.isPending ? <Loader2Icon className="animate-spin" /> : '다음'}
       </Button>
     </div>
   );
@@ -407,11 +407,40 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
 };
 
 const TermsAgreement = () => {
-  const { control } = useFormContext<SignUpSchema>();
+  const [selectAll, setSelectAll] = useState(false);
+
+  const { control, setValue, watch } = useFormContext<SignUpSchema>();
+
+  const [marketingAgree, privacyAgree, termsAgree] = watch([
+    'marketingAgree',
+    'privacyAgree',
+    'termsAgree',
+  ]);
+
+  useEffect(() => {
+    if (marketingAgree && privacyAgree && termsAgree) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [marketingAgree, privacyAgree, termsAgree]);
+
+  const changeSelectAll = (checked: boolean) => {
+    setSelectAll(checked);
+    setValue('privacyAgree', checked);
+    setValue('marketingAgree', checked);
+    setValue('termsAgree', checked);
+  };
+
   return (
     <div className="flex flex-col gap-y-8">
       <h2 className="text-2xl font-bold text-center mb-5">약관 동의하기</h2>
       <div className="space-y-3">
+        <div className="flex flex-row items-center gap-2">
+          <Checkbox checked={selectAll} onCheckedChange={changeSelectAll} />
+          <Label className="text-base font-bold">전체 동의</Label>
+        </div>
+        <Separator />
         <FormField
           name="termsAgree"
           control={control}
@@ -420,7 +449,7 @@ const TermsAgreement = () => {
               <FormControl>
                 <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
-              <FormLabel>
+              <FormLabel className="text-base">
                 <span className="text-red-500">(필수)</span>서비스 이용약관 동의
               </FormLabel>
             </FormItem>
@@ -434,7 +463,7 @@ const TermsAgreement = () => {
               <FormControl>
                 <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
-              <FormLabel>
+              <FormLabel className="text-base">
                 <span className="text-red-500">(필수)</span>개인정보 수집 및 이용 동의 여부
               </FormLabel>
             </FormItem>
@@ -448,7 +477,7 @@ const TermsAgreement = () => {
               <FormControl>
                 <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
-              <FormLabel>
+              <FormLabel className="text-base">
                 <span>(선택)</span>마케팅 정보 수신 동의
               </FormLabel>
             </FormItem>
