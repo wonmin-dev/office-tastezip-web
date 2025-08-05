@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import type { SignInSchema } from "@/modules/auth/ui/views/sign-in-view";
 import type { SignUpSchema } from "@/modules/auth/ui/views/sign-up-view";
 
 type emailVerifyReq = {
@@ -39,4 +40,17 @@ export const getOrganizationNames = async (data: OrganizationNamesReq) => {
 
 export const getRsaKey = async () => {
   return await apiClient.get<string>("/auth/rsa");
+};
+
+type SignInReq = SignInSchema;
+
+type SignInRes = {
+  accessToken: string;
+  email: string;
+  nickname: string;
+  lastLoginAt?: string;
+};
+
+export const postSignIn = async (data: SignInReq) => {
+  return await apiClient.post<SignInRes>("/auth/login", data);
 };

@@ -1,5 +1,6 @@
 import {
   postEmailVerify,
+  postSignIn,
   postSignUp,
   postVerifyCheck,
 } from "@/modules/auth/server/api";
@@ -15,4 +16,8 @@ export const verifyCheckMutationOptions = mutationOptions({
 
 export const signUpMutationOptions = mutationOptions({
   mutationFn: postSignUp,
+});
+
+export const signInMutationOptions = mutationOptions({
+  mutationFn: postSignIn,
 });
