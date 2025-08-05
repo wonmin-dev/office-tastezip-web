@@ -3,6 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
   Form,
   FormControl,
   FormDescription,
@@ -13,6 +20,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Progress } from '@/components/ui/progress';
 import {
   Select,
@@ -22,20 +30,23 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { notEmpty } from '@/lib/utils';
+import { cn, notEmpty } from '@/lib/utils';
 import { JOB_CATEGORIES, POSITION_CATEGORIES } from '@/modules/auth/constants';
 import {
   emailVerifyOptions,
   signUpOptions,
   verifyCheckOptions,
 } from '@/modules/auth/server/mutations';
+import { organizationNamesOptions } from '@/modules/auth/server/queries';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useFunnel } from '@use-funnel/browser';
-import { Loader2Icon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { CommandGroup } from 'cmdk';
+import { ChevronsUpDownIcon, Loader2Icon, PlusIcon } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import z from 'zod';
+import { debounce } from 'es-toolkit';
 
 type SignUpStep = {
   SignUp: {
@@ -330,7 +341,11 @@ interface CreateAccountProps {
 }
 
 const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
-  const { control, trigger, getValues } = useFormContext<SignUpSchema>();
+  const { control, trigger, getValues, setValue } = useFormContext<SignUpSchema>();
+  const [open, setOpen] = useState(false);
+  const [keyword, setKeyword] = useState('');
+
+  const { data: organizationNames } = useQuery(organizationNamesOptions({ name: keyword }));
 
   const proceedToNext = async () => {
     const isValid = await trigger(['nickname', 'job', 'position', 'joinYear']);
@@ -346,6 +361,11 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
     }
   };
 
+  const debounceSetKeyword = useCallback(
+    debounce((keyword) => setKeyword(keyword), 300),
+    [],
+  );
+
   return (
     <div className="flex flex-col gap-y-8">
       <h2 className="text-2xl font-bold text-center mb-5">계정 생성하기</h2>
@@ -359,6 +379,68 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
               <Input {...field} />
             </FormControl>
             <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        name="organizationName"
+        control={control}
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>기업명</FormLabel>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      'w-[320px] justify-between',
+                      !field.value && 'text-muted-foreground',
+                    )}
+                  >
+                    {field.value || '기업명을 입력하세요.'}
+                    <ChevronsUpDownIcon className="ml-2 h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-[320px] p-0">
+                <Command>
+                  <CommandInput
+                    onValueChange={debounceSetKeyword}
+                    placeholder="기업명 검색"
+                    className="h-9"
+                  />
+                  <CommandList>
+                    <CommandEmpty>검색 결과 없음</CommandEmpty>
+                    <CommandGroup>
+                      {organizationNames?.map(({ id, name }) => (
+                        <CommandItem
+                          key={id}
+                          value={id}
+                          onSelect={() => {
+                            setValue('organizationName', id);
+                          }}
+                        >
+                          {name}
+                        </CommandItem>
+                      ))}
+                      {keyword && (
+                        <CommandItem
+                          value={keyword}
+                          onSelect={() => {
+                            setValue('organizationName', keyword);
+                            setOpen(false);
+                          }}
+                        >
+                          <PlusIcon className="ml-1 size-4" />"{keyword}" 새로 추가하기
+                        </CommandItem>
+                      )}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </FormItem>
         )}
       />
