@@ -5,14 +5,14 @@ import {
 } from "@/modules/auth/server/api";
 import { mutationOptions } from "@tanstack/react-query";
 
-export const emailVerifyOptions = mutationOptions({
+export const emailVerifyMutationOptions = mutationOptions({
   mutationFn: postEmailVerify,
 });
 
-export const verifyCheckOptions = mutationOptions({
+export const verifyCheckMutationOptions = mutationOptions({
   mutationFn: postVerifyCheck,
 });
 
-export const signUpOptions = mutationOptions({
+export const signUpMutationOptions = mutationOptions({
   mutationFn: postSignUp,
 });

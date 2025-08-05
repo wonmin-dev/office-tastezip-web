@@ -3,7 +3,7 @@
 import { Form } from '@/components/ui/form';
 import { Progress } from '@/components/ui/progress';
 import { notEmpty } from '@/lib/utils';
-import { signUpOptions } from '@/modules/auth/server/mutations';
+import { signUpMutationOptions } from '@/modules/auth/server/mutations';
 import { AuthenticateEmailSection } from '@/modules/auth/ui/sections/authenticate-email-section';
 import { CreateAccountSection } from '@/modules/auth/ui/sections/create-account-section';
 import { SignUpSection } from '@/modules/auth/ui/sections/sign-up-section';
@@ -114,7 +114,7 @@ export const SignUpView = () => {
     },
   });
 
-  const signUp = useMutation(signUpOptions);
+  const signUp = useMutation(signUpMutationOptions);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear().toString());

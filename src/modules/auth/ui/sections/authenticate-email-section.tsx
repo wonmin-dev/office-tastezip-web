@@ -3,7 +3,10 @@
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { emailVerifyOptions, verifyCheckOptions } from '@/modules/auth/server/mutations';
+import {
+  emailVerifyMutationOptions,
+  verifyCheckMutationOptions,
+} from '@/modules/auth/server/mutations';
 import type { SignUpSchema } from '@/modules/auth/ui/views/sign-up-view';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2Icon } from 'lucide-react';
@@ -17,8 +20,8 @@ interface AuthenticateEmailSectionProps {
 
 export const AuthenticateEmailSection = ({ email, onNext }: AuthenticateEmailSectionProps) => {
   const { control, getValues, trigger } = useFormContext<SignUpSchema>();
-  const emailVerify = useMutation(emailVerifyOptions);
-  const verifyCheck = useMutation(verifyCheckOptions);
+  const emailVerify = useMutation(emailVerifyMutationOptions);
+  const verifyCheck = useMutation(verifyCheckMutationOptions);
 
   const sendAuthenticate = () => {
     emailVerify.mutate(
