@@ -535,7 +535,12 @@ const CreateAccount = ({ onNext, currentYear }: CreateAccountProps) => {
 const TermsAgreement = () => {
   const [selectAll, setSelectAll] = useState(false);
 
-  const { control, setValue, watch } = useFormContext<SignUpSchema>();
+  const {
+    control,
+    setValue,
+    watch,
+    formState: { isLoading },
+  } = useFormContext<SignUpSchema>();
 
   const [marketingAgree, privacyAgree, termsAgree] = watch([
     'marketingAgree',
@@ -610,7 +615,9 @@ const TermsAgreement = () => {
           )}
         />
       </div>
-      <Button type="submit">다음</Button>
+      <Button type="submit" disabled={isLoading} className="hover:cursor-pointer">
+        {isLoading ? <Loader2Icon className="animate-spin" /> : '다음'}
+      </Button>
     </div>
   );
 };
