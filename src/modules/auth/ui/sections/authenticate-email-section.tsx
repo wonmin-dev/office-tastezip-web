@@ -8,6 +8,7 @@ import type { SignUpSchema } from '@/modules/auth/ui/views/sign-up-view';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2Icon } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
+import { toast } from 'sonner';
 
 interface AuthenticateEmailSectionProps {
   email: string;
@@ -18,6 +19,13 @@ export const AuthenticateEmailSection = ({ email, onNext }: AuthenticateEmailSec
   const { control, getValues, trigger } = useFormContext<SignUpSchema>();
   const emailVerify = useMutation(emailVerifyOptions);
   const verifyCheck = useMutation(verifyCheckOptions);
+
+  const sendAuthenticate = () => {
+    emailVerify.mutate(
+      { email },
+      { onSuccess: () => toast.success('인증번호가 발송되었습니다. 메일함을 확인해주세요.') },
+    );
+  };
 
   const proceedToNext = async () => {
     const isValid = await trigger(['code']);
@@ -55,7 +63,7 @@ export const AuthenticateEmailSection = ({ email, onNext }: AuthenticateEmailSec
         <Button
           type="button"
           variant="outline"
-          onClick={() => emailVerify.mutate({ email })}
+          onClick={sendAuthenticate}
           className="hover:cursor-pointer"
           disabled={emailVerify.isPending}
         >
