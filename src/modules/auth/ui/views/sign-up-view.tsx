@@ -123,11 +123,12 @@ export const SignUpView = () => {
   const onSubmit = (data: SignUpSchema) => {
     signUp.mutate(data, {
       onSuccess: () => {
-        toast.info('회원가입 성공');
+        toast.success('계정이 생성되었습니다!');
         router.replace('/sign-in');
       },
     });
   };
+
   return (
     <div className="min-w-xs">
       <Progress value={(funnel.index + 1) * 20} className="absolute top-10 w-[320px]" />
