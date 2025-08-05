@@ -47,6 +47,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import z from 'zod';
 import { debounce } from 'es-toolkit';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 type SignUpStep = {
   SignUp: {
@@ -117,6 +119,8 @@ export type SignUpSchema = z.infer<typeof signUpSchema>;
 export const SignUpFormSection = () => {
   const [currentYear, setCurrentYear] = useState<string>('2025');
 
+  const router = useRouter();
+
   const funnel = useFunnel<SignUpStep>({
     id: 'signUp',
     initial: {
@@ -150,7 +154,12 @@ export const SignUpFormSection = () => {
   }, []);
 
   const onSubmit = (data: SignUpSchema) => {
-    signUp.mutate(data);
+    signUp.mutate(data, {
+      onSuccess: () => {
+        toast.info('회원가입 성공');
+        router.replace('/sign-in');
+      },
+    });
   };
 
   return (

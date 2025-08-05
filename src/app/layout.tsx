@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${pretendard.className} antialiased`}>
         <Providers>
-          <Toaster />
+          <Toaster position="top-center" />
           {children}
         </Providers>
       </body>
