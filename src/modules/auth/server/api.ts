@@ -36,3 +36,7 @@ export const getOrganizationNames = async (data: OrganizationNamesReq) => {
     `/organizations/name-search?${params.toString()}`
   );
 };
+
+export const getRsaKey = async () => {
+  return await apiClient.get<string>("/auth/rsa");
+};
