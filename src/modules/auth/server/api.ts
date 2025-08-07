@@ -1,6 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import type { SignInSchema } from "@/modules/auth/ui/views/sign-in-view";
-import type { SignUpSchema } from "@/modules/auth/ui/views/sign-up-view";
+import type { SignInSchema, SignUpSchema } from "@/lib/schema/auth";
 
 type emailVerifyReq = {
   email: string;
