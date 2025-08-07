@@ -11,8 +11,10 @@ import { Loader2Icon } from 'lucide-react';
 import { toast } from 'sonner';
 import { signIn } from 'next-auth/react';
 import { signInSchema, type SignInSchema } from '@/lib/schema/auth';
+import { useRouter } from 'next/navigation';
 
 export const SignInView = () => {
+  const router = useRouter();
   const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -23,9 +25,16 @@ export const SignInView = () => {
 
   const onSubmit = async (data: SignInSchema) => {
     const { email, password } = data;
-    const result = await signIn('credentials', { email, password, redirect: false });
-    if (result.error === 'CredentialsSignin') {
-      toast.error('이메일 또는 비밀번호가 일치하지 않습니 다.');
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (!result.ok) {
+      toast.error('이메일 또는 비밀번호가 일치하지 않습니다.');
+    } else {
+      router.push('/');
     }
   };
 
