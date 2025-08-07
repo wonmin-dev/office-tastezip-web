@@ -3,11 +3,11 @@
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import type { SignUpSchema } from '@/lib/schema/auth';
 import {
   emailVerifyMutationOptions,
   verifyCheckMutationOptions,
 } from '@/modules/auth/server/mutations';
-import type { SignUpSchema } from '@/modules/auth/ui/views/sign-up-view';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2Icon } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';

@@ -19,10 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import type { SignUpSchema } from '@/lib/schema/auth';
 import { cn } from '@/lib/utils';
 import { JOB_CATEGORIES, POSITION_CATEGORIES } from '@/modules/auth/constants';
 import { organizationNamesQueryOptions } from '@/modules/auth/server/queries';
-import type { SignUpSchema } from '@/modules/auth/ui/views/sign-up-view';
 import { useQuery } from '@tanstack/react-query';
 import { debounce } from 'es-toolkit';
 import { ChevronsUpDownIcon, PlusIcon } from 'lucide-react';

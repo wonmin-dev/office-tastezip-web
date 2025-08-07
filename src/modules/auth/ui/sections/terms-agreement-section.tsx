@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import type { SignUpSchema } from '@/modules/auth/ui/views/sign-up-view';
+import type { SignUpSchema } from '@/lib/schema/auth';
 import { Loader2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
