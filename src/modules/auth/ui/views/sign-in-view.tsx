@@ -3,31 +3,16 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { rsaKeyQueryOptions } from '@/modules/auth/server/queries';
-import { passwordRsaEncrypt } from '@/lib/utils';
-import { signInMutationOptions } from '@/modules/auth/server/mutations';
-import { useRouter } from 'next/navigation';
 import { Loader2Icon } from 'lucide-react';
-
-const signInSchema = z.object({
-  email: z.email(),
-  password: z.string().trim().min(1),
-});
-
-export type SignInSchema = z.infer<typeof signInSchema>;
+import { toast } from 'sonner';
+import { signIn } from 'next-auth/react';
+import { signInSchema, type SignInSchema } from '@/lib/schema/auth';
 
 export const SignInView = () => {
-  const router = useRouter();
-
-  const { data: rsaKey } = useQuery(rsaKeyQueryOptions);
-  const signIn = useMutation(signInMutationOptions);
-
   const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -36,18 +21,12 @@ export const SignInView = () => {
     },
   });
 
-  const onSubmit = (data: SignInSchema) => {
+  const onSubmit = async (data: SignInSchema) => {
     const { email, password } = data;
-    const encrypted = passwordRsaEncrypt(password, rsaKey);
-    signIn.mutate(
-      { email, password: encrypted },
-      {
-        onSuccess: (data) => {
-          console.log(data);
-          router.push('/');
-        },
-      },
-    );
+    const result = await signIn('credentials', { email, password, redirect: false });
+    if (result.error === 'CredentialsSignin') {
+      toast.error('이메일 또는 비밀번호가 일치하지 않습니 다.');
+    }
   };
 
   return (
@@ -80,8 +59,12 @@ export const SignInView = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={signIn.isPending} className="cursor-pointer mt-5">
-            {signIn.isPending ? <Loader2Icon className="animate-spin" /> : 'Login'}
+          <Button
+            type="submit"
+            disabled={form.formState.isSubmitting}
+            className="cursor-pointer mt-5"
+          >
+            {form.formState.isSubmitting ? <Loader2Icon className="animate-spin" /> : 'Login'}
           </Button>
         </form>
       </Form>
