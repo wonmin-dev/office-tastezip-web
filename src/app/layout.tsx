@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${pretendard.className} antialiased`}>
+    <html lang="en" className={pretendard.className}>
+      <body className="antialiased">
         <Providers>
           <Toaster position="top-center" />
           {children}

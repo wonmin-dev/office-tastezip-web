@@ -1,7 +1,7 @@
 import { signInSchema } from "@/lib/schema/auth";
 import { passwordRsaEncrypt } from "@/lib/utils";
 import { getRsaKey, postSignIn } from "@/modules/auth/server/api";
-import NextAuth, { CredentialsSignin } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -37,7 +37,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
         } catch (error) {
           console.error(error);
-          throw new CredentialsSignin("Invalid credentials");
+          throw new Error("Invalid credentials");
         }
       },
     }),
@@ -47,10 +47,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
     jwt: async ({ token, user }) => {
+      if (user?.accessToken) {
+        token.accessToken = user.accessToken;
+      }
       return token;
     },
     session: async ({ session, token }) => {
+      if (token) {
+        session.accessToken = token.accessToken;
+      }
       return session;
+    },
+    authorized: async ({ auth }) => {
+      return !!auth;
     },
   },
   pages: {
